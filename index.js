@@ -20,24 +20,31 @@ const SUBMISSION = [
 
 ]
 
-const admin = [];
+const ADMIN = [];
+const userStatus = 0;
 
 
 
 app.post('/signup', function(req, res) {
   // Add logic to decode body
   // body should have email and password
-
-  const {email,password} = req.body;
+  const {email,password,choice} = req.body;
   const user = {
     email,
     password
   }
   //Store email and password (as is for now) in the USERS array above (only if the user with the given email doesnt exist)
-  if(!USERS.includes(email)){
-    USERS.push(user)
+  if(choice === "user"){
+    if(!USERS.includes(email)){
+      USERS.push(user)
+    }
+    userStatus = 0
+  }else{
+    if(!ADMIN.includes(email)){
+      ADMIN.push(user)
+    }
+    userStatus = 1;
   }
-  console.log(USERS);
   
   // return back 200 status code to the client
   res.status(200).json({
@@ -103,6 +110,26 @@ app.post("/submissions", function(req, res) {
 // leaving as hard todos
 // Create a route that lets an admin add a new problem
 // ensure that only admins can do that.
+
+app.post("/questions", (req,res)=>{
+
+  if(!userStatus){
+    return res.status(401).json({
+      status: "fail",
+      message: "you are not an admin"
+    })
+  }
+
+  const question = req.body.question;
+  QUESTIONS.push(question);
+
+  req.status(200).json({
+    status: "success",
+    question 
+  })
+
+})
+
 
 app.listen(port, function() {
   console.log(`Example app listening on port ${port}`)
